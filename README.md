@@ -8,6 +8,13 @@
 - list
 - list
 
+Code Sample:
+```cpp
+console.log(`Result: ${evaluateExpression(input)}`);
+```
+
+[LINK_SAMPLE](https://jay9680.github.io/CJ-paint-app/)
+
 Other text have other markdowns
 
 Feel free to edit
