@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Gift For My CJ ❤️</title>
+    <style>
+        :root {
+            --gold: #ffd700;
+            --pink: #ff6b8b;
+            --dark: #050508;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+        }
+
+        #webgl-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* --- Opening Scene Overlay --- */
+        #opening-scene {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #10101a 0%, #030305 100%);
+            transition: opacity 2s ease, visibility 2s ease;
+        }
+
+        .title-glow {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5), 0 0 20px rgba(255, 107, 139, 0.3);
+            margin-bottom: 2rem;
+            animation: pulseGlow 3s infinite alternate ease-in-out;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        .click-hint {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            animation: fadeInOut 2s infinite ease-in-out;
+        }
+
+        /* --- UI Overlay for Note --- */
+        #note-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 3s ease;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+        }
+
+        .handwritten-note {
+            background: rgba(15, 15, 25, 0.85);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(255, 215, 0, 0.1);
+            border-radius: 16px;
+            padding: 3rem 2.5rem;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 3s ease;
+        }
+
+        .handwritten-note h2 {
+            font-family: 'Georgia', serif;
+            color: var(--gold);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: normal;
+        }
+
+        .handwritten-note p {
+            font-family: 'Georgia', serif;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #e0e0e0;
+            margin-bottom: 1.5rem;
+        }
+
+        .handwritten-note .signature {
+            color: var(--pink);
+            font-style: italic;
+            font-size: 1.2rem;
+        }
+
+        .final-text {
+            margin-top: 2rem;
+            font-size: 1.4rem;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255,255,255,0.8);
+            display: none;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        /* --- Audio Controls --- */
+        #audio-control {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 8;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            transition: background 0.3s ease;
+            display: none;
+        }
+
+        #audio-control:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* --- Animations --- */
+        @keyframes pulseGlow {
+            0% { text-shadow: 0 0 10px rgba(255, 215, 0, 0.4), 0 0 20px rgba(255, 107, 139, 0.2); }
+            100% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 35px rgba(255, 107, 139, 0.6); }
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.9; }
+        }
+
+        /* --- Screen Code Overlay canvas --- */
+        #code-canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="webgl-container"></div>
+
+    <!-- Opening Scene UI -->
+    <div id="opening-scene">
+        <div class="title-glow">My CJ ❤️ - A Special Gift For You</div>
+        <div class="click-hint">Click the Gift Box to Open</div>
+    </div>
+
+    <!-- Letter Overlay -->
+    <div id="note-container">
+        <div class="handwritten-note" id="note-box">
+            <h2>Dear CJ ❤️</h2>
+            <p>You have spent countless hours creating beautiful things with your talent. I hope this little surprise reminds you that someone truly admires your passion, your dedication, and your smile.</p>
+            <p>Keep coding, keep dreaming, and never stop being amazing.</p>
+            <div class="signature">With admiration, ❤️ From Someone Who Believes in You ❤️</div>
+            <div class="final-text" id="final-text">Good Night, CJ 🌙❤️</div>
+        </div>
+    </div>
+
+    <button id="audio-control">🔊 MUTE AMBIENCE</button>
+
+    <canvas id="code-canvas" width="512" height="512"></canvas>
+
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        // --- Global State ---
+        let scene, camera, renderer;
+        let giftBoxGroup, roomGroup;
+        let isOpened = false;
+        let clock = new THREE.Clock();
+        
+        // Animated Room Objects
+        let characterGroup, headMesh, leftArmMesh, rightArmMesh, hairMesh;
+        let mugMesh, steamParticles;
+        let monitorMaterial, codeTexture, codeCtx;
+        let rainParticles, dustParticles, heartParticles;
+        let pcFanGroup1, pcFanGroup2;
+        let roomLight, warmLight;
+
+        // Code Generation Stream Data
+        const codeLines = [
+            "#include <iostream>",
+            "using namespace std;",
+            "",
+            "class Developer {",
+            "public:",
+            "    string name = \"CJ\";",
+            "    bool isPassionate = true;",
+            "    void createMagic() {",
+            "        while(isPassionate) {",
+            "            code();",
+            "            inspire();",
+            "        }",
+            "    }",
+            "};",
+            "",
+            "/* HTML & CSS Architecture */",
+            "<div class=\"developer-room\">",
+            "   <span class=\"glow\">CJ Coding...</span>",
+            "</div>",
+            "",
+            "body { background: #050508; color: #fff; }",
+            "function renderDreams() { return true; }"
+        ];
+        let currentLine = 0;
+        let currentChar = 0;
+        let displayedCode = [];
+
+        // Web Audio Synthesizer Engine
+        let audioCtx, rainGain, pianoGain, synthInterval;
+        let isMuted = false;
+
+        // Initialize Application
+        window.addEventListener('DOMContentLoaded', () => {
+            initThree();
+            initCodeCanvas();
+            createGiftScene();
+            createRoomScene();
+            animate();
+            
+            // Interaction Listener
+            window.addEventListener('resize', onWindowResize);
+            document.getElementById('opening-scene').addEventListener('click', openGift);
+            document.getElementById('audio-control').addEventListener('click', toggleAudio);
+        });
+
+        // --- Three.js Setup ---
+        function initThree() {
+            const container = document.getElementById('webgl-container');
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x050508, 0.03);
+
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 2, 6);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
+            container.appendChild(renderer.domElement);
+        }
+
+        // --- Code Screen Texture Generator ---
+        function initCodeCanvas() {
+            const canvas = document.getElementById('code-canvas');
+            codeCtx = canvas.getContext('2d');
+            codeTexture = new THREE.CanvasTexture(canvas);
+            updateCodeCanvas();
+        }
+
+        function updateCodeCanvas() {
+            codeCtx.fillStyle = '#1e1e1e';
+            codeCtx.fillRect(0, 0, 512, 512);
+
+            // VS Code Header Bar
+            codeCtx.fillStyle = '#252526';
+            codeCtx.fillRect(0, 0, 512, 30);
+            codeCtx.fillStyle = '#ff5f56'; codeCtx.beginPath(); codeCtx.arc(15, 15, 5, 0, Math.PI*2); codeCtx.fill();
+            codeCtx.fillStyle = '#ffbd2e'; codeCtx.beginPath(); codeCtx.arc(30, 15, 5, 0, Math.PI*2); codeCtx.fill();
+            codeCtx.fillStyle = '#27c93f'; codeCtx.beginPath(); codeCtx.arc(45, 15, 5, 0, Math.PI*2); codeCtx.fill();
+
+            // Code Text
+            codeCtx.font = '14px Consolas, "Courier New", monospace';
+            codeCtx.fillStyle = '#007acc';
+            codeCtx.fillText("main.cpp - Visual Studio Code", 60, 20);
+
+            let y = 60;
+            const startLine = Math.max(0, displayedCode.length - 22);
+            for (let i = startLine; i < displayedCode.length; i++) {
+                const line = displayedCode[i];
+                codeCtx.fillStyle = '#858585';
+                codeCtx.fillText((i + 1).toString().padStart(2, ' '), 15, y);
+
+                // Syntax highlighting mock
+                if (line.includes('#include') || line.includes('class') || line.includes('public:')) {
+                    codeCtx.fillStyle = '#569cd6';
+                } else if (line.includes('"')) {
+                    codeCtx.fillStyle = '#ce9178';
+                } else if (line.includes('//') || line.includes('/*')) {
+                    codeCtx.fillStyle = '#6a9955';
+                } else {
+                    codeCtx.fillStyle = '#d4d4d4';
+                }
+                codeCtx.fillText(line, 45, y);
+                y += 20;
+            }
+
+            // Cursor
+            if (Math.floor(Date.now() / 500) % 2 === 0) {
+                codeCtx.fillStyle = '#aeafad';
+                codeCtx.fillRect(45 + (currentChar * 8.5), y - 20, 8, 16);
+            }
+
+            if (codeTexture) codeTexture.needsUpdate = true;
+        }
+
+        function typeCodeStep() {
+            if (!isOpened) return;
+            if (currentLine < codeLines.length) {
+                const fullLine = codeLines[currentLine];
+                if (currentChar < fullLine.length) {
+                    if (!displayedCode[currentLine]) displayedCode[currentLine] = "";
+                    displayedCode[currentLine] += fullLine[currentChar];
+                    currentChar++;
+                    if (Math.random() > 0.4) playTypingSound();
+                } else {
+                    currentLine++;
+                    currentChar = 0;
+                }
+            } else {
+                currentLine = 0;
+                currentChar = 0;
+                displayedCode = [];
+            }
+            updateCodeCanvas();
+        }
+
+        // --- Opening Scene: 3D Gift Box ---
+        function createGiftScene() {
+            giftBoxGroup = new THREE.Group();
+
+            // Box Base
+            const boxGeo = new THREE.BoxGeometry(1.5, 1.2, 1.5);
+            const boxMat = new THREE.MeshStandardMaterial({
+                color: 0x11111d,
+                roughness: 0.3,
+                metalness: 0.8
+            });
+            const boxMesh = new THREE.Mesh(boxGeo, boxMat);
+            boxMesh.castShadow = true;
+            giftBoxGroup.add(boxMesh);
+
+            // Golden Ribbon
+            const ribMat = new THREE.MeshStandardMaterial({
+                color: 0xffd700,
+                roughness: 0.2,
+                metalness: 0.9
+            });
+            const rib1 = new THREE.Mesh(new THREE.BoxGeometry(1.52, 1.22, 0.2), ribMat);
+            const rib2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.22, 1.52), ribMat);
+            giftBoxGroup.add(rib1, rib2);
+
+            // Bow
+            const bowGeo = new THREE.TorusKnotGeometry(0.25, 0.08, 64, 8);
+            const bowMesh = new THREE.Mesh(bowGeo, ribMat);
+            bowMesh.position.y = 0.7;
+            giftBoxGroup.add(bowMesh);
+
+            // Particles around gift
+            const pGeo = new THREE.BufferGeometry();
+            const pCount = 150;
+            const posArray = new Float32Array(pCount * 3);
+            for (let i = 0; i < pCount * 3; i += 3) {
+                posArray[i] = (Math.random() - 0.5) * 4;
+                posArray[i+1] = (Math.random() - 0.5) * 4;
+                posArray[i+2] = (Math.random() - 0.5) * 4;
+            }
+            pGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const pMat = new THREE.PointsMaterial({
+                size: 0.03,
+                color: 0xffd700,
+                transparent: true,
+                opacity: 0.8
+            });
+            const particles = new THREE.Points(pGeo, pMat);
+            giftBoxGroup.add(particles);
+
+            scene.add(giftBoxGroup);
+
+            // Initial Lighting for Gift
+            const light = new THREE.PointLight(0xffd700, 2, 10);
+            light.position.set(2, 3, 2);
+            scene.add(light);
+            
+            const ambient = new THREE.AmbientLight(0xffffff, 0.2);
+            scene.add(ambient);
+        }
+
+        // --- Main Scene: Hyper-Realistic Room ---
+        function createRoomScene() {
+            roomGroup = new THREE.Group();
+            roomGroup.position.set(0, -100, 0); // Hide initially below ground
+
+            // Walls & Floor
+            const wallMat = new THREE.MeshStandardMaterial({ color: 0x0f0f15, roughness: 0.8 });
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0d, roughness: 0.2, metalness: 0.1 });
+
+            const floor = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            floor.receiveShadow = true;
+            roomGroup.add(floor);
+
+            const backWall = new THREE.Mesh(new THREE.PlaneGeometry(12, 8), wallMat);
+            backWall.position.set(0, 4, -6);
+            backWall.receiveShadow = true;
+            roomGroup.add(backWall);
+
+            // Left Window Frame & Moon Visuals
+            const windowFrame = new THREE.Mesh(new THREE.BoxGeometry(0.2, 5, 4), wallMat);
+            windowFrame.position.set(-5.9, 3.5, -1);
+            roomGroup.add(windowFrame);
+
+            // Outside Moon Light & Sky Mesh
+            const moonGeo = new THREE.SphereGeometry(1.2, 32, 32);
+            const moonMat = new THREE.MeshBasicMaterial({ color: 0xeeeeff });
+            const moon = new THREE.Mesh(moonGeo, moonMat);
+            moon.position.set(-18, 8, -12);
+            roomGroup.add(moon);
+
+            const moonLight = new THREE.DirectionalLight(0x88aaee, 2.5);
+            moonLight.position.set(-18, 12, -10);
+            moonLight.castShadow = true;
+            moonLight.shadow.mapSize.width = 2048;
+            moonLight.shadow.mapSize.height = 2048;
+            roomGroup.add(moonLight);
+
+            // Desk Setup
+            const deskMat = new THREE.MeshStandardMaterial({ color: 0x1a1a24, roughness: 0.5 });
+            const deskTop = new THREE.Mesh(new THREE.BoxGeometry(4, 0.1, 2), deskMat);
+            deskTop.position.set(0, 1.4, -2);
+            deskTop.receiveShadow = true;
+            deskTop.castShadow = true;
+            roomGroup.add(deskTop);
+
+            // Curved Dual Monitors
+            const monitorMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.1 });
+            const screenMat = new THREE.MeshBasicMaterial({ map: codeTexture });
+
+            const mainMonitor = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.2, 0.05), monitorMat);
+            mainMonitor.position.set(-0.2, 2.3, -2.1);
+            
+            const screenMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.1, 1.1), screenMat);
+            screenMesh.position.set(-0.2, 2.3, -2.07);
+            roomGroup.add(mainMonitor, screenMesh);
+
+            // Screen Glow Light onto CJ
+            roomLight = new THREE.PointLight(0x00aaff, 1.8, 4);
+            roomLight.position.set(-0.2, 2.3, -1.5);
+            roomGroup.add(roomLight);
+
+            // Warm Ambient Room Light
+            warmLight = new THREE.PointLight(0xffaa55, 0, 6);
+            warmLight.position.set(0, 3, 0);
+            roomGroup.add(warmLight);
+
+            // PC Tower with RGB Fans
+            const pcCase = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.2, 1.2), new THREE.MeshStandardMaterial({ color: 0x111116, metalness: 0.8, roughness: 0.2 }));
+            pcCase.position.set(1.5, 2.0, -2);
+            roomGroup.add(pcCase);
+
+            pcFanGroup1 = createRGBFan(); pcFanGroup1.position.set(1.2, 2.2, -1.5);
+            pcFanGroup2 = createRGBFan(); pcFanGroup2.position.set(1.2, 1.8, -1.5);
+            roomGroup.add(pcFanGroup1, pcFanGroup2);
+
+            // Mechanical RGB Keyboard & Mouse
+            const kbMat = new THREE.MeshStandardMaterial({ color: 0x22222a });
+            const keyboard = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.03, 0.3), kbMat);
+            keyboard.position.set(-0.2, 1.46, -1.5);
+            roomGroup.add(keyboard);
+
+            const mouse = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.03, 0.15), kbMat);
+            mouse.position.set(0.5, 1.46, -1.5);
+            roomGroup.add(mouse);
+
+            // Mug with Coffee Steam
+            const mugMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: 0.3 });
+            mugMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.18), mugMat);
+            mugMesh.position.set(-0.9, 1.52, -1.4);
+            roomGroup.add(mugMesh);
+            createSteamParticles();
+
+            // Plant & Books
+            createDecorations();
+
+            // Character "CJ" (Stylized Human Model in Gaming Chair)
+            createCharacterCJ();
+
+            // Atmospheric Particles (Rain Outside & Dust Inside)
+            createRain();
+            createDust();
+            createHeartParticles();
+
+            scene.add(roomGroup);
+        }
+
+        function createRGBFan() {
+            const group = new THREE.Group();
+            const ringGeo = new THREE.TorusGeometry(0.12, 0.02, 16, 32);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0x00ffcc });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            group.add(ring);
+            return group;
+        }
+
+        function createDecorations() {
+            // Books
+            const bookMat = new THREE.MeshStandardMaterial({ color: 0x882233 });
+            const book = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.2, 0.4), bookMat);
+            book.position.set(-1.5, 1.5, -2);
+            roomGroup.add(book);
+
+            // Plant
+            const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.1, 0.3), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+            pot.position.set(-1.5, 1.75, -2);
+            const plantGeo = new THREE.DodecahedronGeometry(0.2);
+            const plantMat = new THREE.MeshStandardMaterial({ color: 0x22aa44, roughness: 0.9 });
+            const plant = new THREE.Mesh(plantGeo, plantMat);
+            plant.position.set(-1.5, 2.0, -2);
+            roomGroup.add(pot, plant);
+        }
+
+        function createCharacterCJ() {
+            characterGroup = new THREE.Group();
+            
+            // Gaming Chair
+            const chairMat = new THREE.MeshStandardMaterial({ color: 0x15151e, roughness: 0.4 });
+            const seat = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.15, 0.8), chairMat);
+            seat.position.set(-0.2, 0.8, -1.0);
+            
+            const backrest = new THREE.Mesh(new THREE.BoxGeometry(0.7, 1.3, 0.15), chairMat);
+            backrest.position.set(-0.2, 1.45, -0.6);
+            characterGroup.add(seat, backrest);
+
+            // CJ (Body Mesh Assembly - View from Behind)
+            const skinMat = new THREE.MeshStandardMaterial({ color: 0xffdbac, roughness: 0.6 });
+            const clothesMat = new THREE.MeshStandardMaterial({ color: 0x2b2b36, roughness: 0.8 }); // Cozy Hoodie
+            const hairMat = new THREE.MeshStandardMaterial({ color: 0x1c100b, roughness: 0.9 }); // Dark Natural Hair
+
+            // Torso / Back
+            const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.22, 0.8, 16), clothesMat);
+            torso.position.set(-0.2, 1.25, -0.9);
+            characterGroup.add(torso);
+
+            // Head
+            headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.18, 32, 32), skinMat);
+            headMesh.position.set(-0.2, 1.78, -0.9);
+            characterGroup.add(headMesh);
+
+            // Realistic Flowing Hair
+            hairMesh = new THREE.Group();
+            for (let i = 0; i < 15; i++) {
+                const strand = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.05, 0.5), hairMat);
+                strand.position.set(-0.2 + (Math.random()-0.5)*0.2, 1.75 - Math.random()*0.1, -0.85 + (Math.random()-0.5)*0.1);
+                strand.rotation.z = (Math.random() - 0.5) * 0.3;
+                hairMesh.add(strand);
+            }
+            characterGroup.add(hairMesh);
+
+            // Arms typing
+            leftArmMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.05, 0.5), clothesMat);
+            leftArmMesh.position.set(-0.45, 1.3, -1.2);
+            leftArmMesh.rotation.x = Math.PI / 3;
+            leftArmMesh.rotation.z = -Math.PI / 12;
+
+            rightArmMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.05, 0.5), clothesMat);
+            rightArmMesh.position.set(0.05, 1.3, -1.2);
+            rightArmMesh.rotation.x = Math.PI / 3;
+            rightArmMesh.rotation.z = Math.PI / 12;
+
+            characterGroup.add(leftArmMesh, rightArmMesh);
+
+            roomGroup.add(characterGroup);
+        }
+
+        // --- Particle Systems ---
+        function createSteamParticles() {
+            const count = 20;
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            for(let i=0; i<count*3; i+=3) {
+                pos[i] = -0.9 + (Math.random()-0.5)*0.05;
+                pos[i+1] = 1.6 + Math.random()*0.2;
+                pos[i+2] = -1.4 + (Math.random()-0.5)*0.05;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.03, transparent: true, opacity: 0.3 });
+            steamParticles = new THREE.Points(geo, mat);
+            roomGroup.add(steamParticles);
+        }
+
+        function createRain() {
+            const count = 600;
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            for(let i=0; i<count*3; i+=3) {
+                pos[i] = -6 + (Math.random()-0.5)*4;
+                pos[i+1] = Math.random() * 8;
+                pos[i+2] = -1 + (Math.random()-0.5)*6;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ color: 0x88aaff, size: 0.04, transparent: true, opacity: 0.6 });
+            rainParticles = new THREE.Points(geo, mat);
+            roomGroup.add(rainParticles);
+        }
+
+        function createDust() {
+            const count = 150;
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            for(let i=0; i<count*3; i+=3) {
+                pos[i] = (Math.random()-0.5)*8;
+                pos[i+1] = Math.random()*4;
+                pos[i+2] = (Math.random()-0.5)*6;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.02, transparent: true, opacity: 0.2 });
+            dustParticles = new THREE.Points(geo, mat);
+            roomGroup.add(dustParticles);
+        }
+
+        function createHeartParticles() {
+            const count = 40;
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(count * 3);
+            for(let i=0; i<count*3; i+=3) {
+                pos[i] = (Math.random()-0.5)*4;
+                pos[i+1] = 1 + Math.random()*3;
+                pos[i+2] = -1 + (Math.random()-0.5)*3;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({ color: 0xff6b8b, size: 0.08, transparent: true, opacity: 0.8 });
+            heartParticles = new THREE.Points(geo, mat);
+            heartParticles.visible = false;
+            roomGroup.add(heartParticles);
+        }
+
+        // --- Transition & Event Logic ---
+        function openGift() {
+            if (isOpened) return;
+            isOpened = true;
+
+            initAudioEngine();
+
+            // Animate Gift Removal
+            document.getElementById('opening-scene').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('opening-scene').style.visibility = 'hidden';
+                document.getElementById('audio-control').style.display = 'block';
+            }, 2000);
+
+            // Shift Camera to Main Scene
+            gsapCameraTransition();
+        }
+
+        function gsapCameraTransition() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 0.015;
+                if (progress <= 1) {
+                    giftBoxGroup.position.y = -progress * 5;
+                    roomGroup.position.y = -100 * (1 - progress);
+                    camera.position.set(0, 2.2 - (progress*0.2), 2 - (progress*0.5));
+                    camera.lookAt(0, 1.8, -1.2);
+                } else {
+                    clearInterval(interval);
+                    startCodingLoop();
+                    scheduleNoteSequence();
+                }
+            }, 16);
+        }
+
+        function startCodingLoop() {
+            setInterval(typeCodeStep, 70);
+        }
+
+        function scheduleNoteSequence() {
+            // After ~15 seconds of immersion, showcase emotional handwritten note
+            setTimeout(() => {
+                const noteContainer = document.getElementById('note-container');
+                noteContainer.style.opacity = '1';
+                noteContainer.querySelector('.handwritten-note').style.transform = 'translateY(0)';
+                
+                heartParticles.visible = true;
+
+                // Transition Lighting to Warm Emotional Glow
+                let t = 0;
+                const lightShift = setInterval(() => {
+                    t += 0.02;
+                    if (t <= 1) {
+                        warmLight.intensity = t * 1.5;
+                        roomLight.color.setHSL(0.08, 0.8, 0.5); // shift to soft warm light
+                    } else {
+                        clearInterval(lightShift);
+                    }
+                }, 30);
+
+                setTimeout(() => {
+                    const fn = document.getElementById('final-text');
+                    fn.style.display = 'block';
+                    setTimeout(() => fn.style.opacity = '1', 100);
+                }, 4000);
+
+            }, 12000);
+        }
+
+        // --- Procedural Sound Synthesis Engine (Web Audio API) ---
+        function initAudioEngine() {
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Continuous Pink Noise Generator for Rain Ambience
+                const bufferSize = audioCtx.sampleRate * 2;
+                const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const output = noiseBuffer.getChannelData(0);
+                let b0=0, b1=0, b2=0, b3=0, b4=0, b5=0, b6=0;
+                for (let i = 0; i < bufferSize; i++) {
+                    let white = Math.random() * 2 - 1;
+                    b0 = 0.99886 * b0 + white * 0.0555179;
+                    b1 = 0.99332 * b1 + white * 0.0750759;
+                    b2 = 0.96900 * b2 + white * 0.1538520;
+                    b3 = 0.86650 * b3 + white * 0.3104856;
+                    b4 = 0.55000 * b4 + white * 0.5329522;
+                    b5 = -0.7616 * b5 - white * 0.0168980;
+                    output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+                    output[i] *= 0.011;
+                    b6 = white * 0.115926;
+                }
+
+                const rainSource = audioCtx.createBufferSource();
+                rainSource.buffer = noiseBuffer;
+                rainSource.loop = true;
+
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+
+                rainGain = audioCtx.createGain();
+                rainGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+
+                rainSource.connect(filter);
+                filter.connect(rainGain);
+                rainGain.connect(audioCtx.destination);
+                rainSource.start();
+
+                // Procedural Melancholic Lo-Fi Piano Synthesizer
+                pianoGain = audioCtx.createGain();
+                pianoGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                pianoGain.connect(audioCtx.destination);
+
+                const scale = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25]; // C Major / A Minor Melancholic pentatonic
+                synthInterval = setInterval(() => {
+                    if (isMuted) return;
+                    if (Math.random() > 0.3) {
+                        const freq = scale[Math.floor(Math.random() * scale.length)];
+                        playLoFiNote(freq);
+                    }
+                }, 1800);
+
+            } catch (e) {
+                console.log("Audio Engine Init Blocked or Not Supported");
+            }
+        }
+
+        function playLoFiNote(freq) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const noteGain = audioCtx.createGain();
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+            noteGain.gain.setValueAtTime(0, audioCtx.currentTime);
+            noteGain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.1);
+            noteGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 3.0);
+
+            osc.connect(noteGain);
+            noteGain.connect(pianoGain);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 3.2);
+        }
+
+        function playTypingSound() {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800 + Math.random()*400, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.04);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        }
+
+        function toggleAudio() {
+            isMuted = !isMuted;
+            const btn = document.getElementById('audio-control');
+            if (isMuted) {
+                if (rainGain) rainGain.gain.setValueAtTime(0, audioCtx.currentTime);
+                btn.innerText = "🔇 UNMUTE AMBIENCE";
+            } else {
+                if (rainGain) rainGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                btn.innerText = "🔊 MUTE AMBIENCE";
+            }
+        }
+
+        // --- Render Loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const elapsedTime = clock.getElapsedTime();
+
+            // Opening Scene Animation
+            if (!isOpened && giftBoxGroup) {
+                giftBoxGroup.rotation.y = elapsedTime * 0.5;
+                giftBoxGroup.position.y = Math.sin(elapsedTime * 2) * 0.1;
+            }
+
+            // Main Scene Animations
+            if (isOpened) {
+                // Subtle Camera Movement (Cinematic Breathing)
+                camera.position.x = Math.sin(elapsedTime * 0.5) * 0.15;
+                camera.position.y = 2.0 + Math.cos(elapsedTime * 0.3) * 0.08;
+                camera.lookAt(-0.2, 1.7, -1.2);
+
+                // CJ Subtle Character Micro-Motions
+                if (headMesh) {
+                    headMesh.position.y = 1.78 + Math.sin(elapsedTime * 2) * 0.005; // Breathing
+                    headMesh.rotation.y = Math.sin(elapsedTime * 0.4) * 0.05;
+                }
+                if (leftArmMesh && rightArmMesh) {
+                    leftArmMesh.rotation.x = (Math.PI / 3) + Math.sin(elapsedTime * 12) * 0.03; // Typing motion
+                    rightArmMesh.rotation.x = (Math.PI / 3) + Math.cos(elapsedTime * 10) * 0.03;
+                }
+                if (hairMesh) {
+                    hairMesh.rotation.z = Math.sin(elapsedTime * 1.5) * 0.02;
+                }
+
+                // PC Fans Spin
+                if (pcFanGroup1 && pcFanGroup2) {
+                    pcFanGroup1.rotation.z = elapsedTime * 8;
+                    pcFanGroup2.rotation.z = elapsedTime * 8;
+                }
+
+                // Steam Particles Drift
+                if (steamParticles) {
+                    const pos = steamParticles.geometry.attributes.position.array;
+                    for(let i=1; i<pos.length; i+=3) {
+                        pos[i] += 0.002;
+                        if(pos[i] > 1.9) pos[i] = 1.6;
+                    }
+                    steamParticles.geometry.attributes.position.needsUpdate = true;
+                }
+
+                // Rain Particles Drop
+                if (rainParticles) {
+                    const pos = rainParticles.geometry.attributes.position.array;
+                    for(let i=1; i<pos.length; i+=3) {
+                        pos[i] -= 0.15;
+                        if(pos[i] < 0) pos[i] = 8;
+                    }
+                    rainParticles.geometry.attributes.position.needsUpdate = true;
+                }
+
+                // Floating Dust
+                if (dustParticles) {
+                    const pos = dustParticles.geometry.attributes.position.array;
+                    for(let i=0; i<pos.length; i+=3) {
+                        pos[i] += Math.sin(elapsedTime + i) * 0.001;
+                        pos[i+1] += Math.cos(elapsedTime + i) * 0.001;
+                    }
+                    dustParticles.geometry.attributes.position.needsUpdate = true;
+                }
+
+                // Floating Hearts Animation
+                if (heartParticles && heartParticles.visible) {
+                    const pos = heartParticles.geometry.attributes.position.array;
+                    for(let i=1; i<pos.length; i+=3) {
+                        pos[i] += 0.003;
+                        if(pos[i] > 4) pos[i] = 1;
+                    }
+                    heartParticles.geometry.attributes.position.needsUpdate = true;
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // --- Window Resize ---
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+    </script>
+</body>
+</html>
